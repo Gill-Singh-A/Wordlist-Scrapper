@@ -30,7 +30,13 @@ lock = Lock()
 
 def download(downloads):
     for path, link in downloads.items():
-        response = requests.get(link)
+        while True:
+            try:
+                response = requests.get(link)
+                break
+            except:
+                with lock:
+                    display('-', f"Retrying => {Back.YELLOW}{path}{Back.RESET}")
         with open(path, 'wb') as file:
             file.write(response.content)
         with lock:
@@ -88,8 +94,8 @@ if __name__ == "__main__":
             wordlists.append(wordlist)
     display(':', f"Dumping Data to Folder {Back.MAGENTA}{data.write}{Back.RESET}")
     with open(f"{data.write}/weakpass.csv", 'w') as file:
-        file.write("Name,Words,Size,Uncompressed Size\n")
-        file.write('\n'.join([f"{wordlist['name']},{wordlist['words']},{wordlist['size']},{wordlist['uncompressed_size']}" for wordlist in wordlists]))
+        file.write("Name,Words,Size,Uncompressed Size,Torrent Link\n")
+        file.write('\n'.join([f"{wordlist['name']},{wordlist['words']},{wordlist['size']},{wordlist['uncompressed_size']},{wordlist['torrent_link']}" for wordlist in wordlists]))
     display(':', f"Downloading Torrent Files")
     t1 = time()
     thread_count = cpu_count()
